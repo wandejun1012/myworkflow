@@ -1,0 +1,45 @@
+name: Python Redis CI
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=5
+
+    steps:
+      - name: Step 1 - Checkout code
+        uses: actions/checkout@v4
+
+      - name: Step 2 - Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Step 3 - Show Python info
+        run: |
+          python --version
+          pip --version
+
+      - name: Step 4 - Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Step 5 - Run app logic
+        run: |
+          python app.py
+
+      - name: Step 6 - Final confirmation
+        run: echo "✅ Python + Redis workflow finished successfully"
